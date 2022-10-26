@@ -1,4 +1,5 @@
-import random, os
+import random, os, time
+import string
 
 # Layout [[card1 info], [card2 info], ...]
 # Layout of card1 info -> [id, card_category & card in category (eg 0-2), name]
@@ -142,7 +143,6 @@ def ht(tokens):
             tokens += bet 
             print(f"That means you have won {bet} Sakrese!\nYou now have {tokens} Sakrese!")
         else: 
-            tokens += bet
             print("You lost...")
             print(f"You still have {tokens} Sakrese.\nMaybe next time.")
         input("")
@@ -184,13 +184,50 @@ def pate(tokens):
                     input(f"You won {len(stack)} cards and now you have {len(player_cards)} versus their {len(ai_cards)}!")
                     break
 
-pate(1000)
+def list_targets(targets):
+    string = ""
+    for target in targets: string += f"{target} "
+    string[:len(string)-1]
+    return string
+def tombola(tokens):
+    bet = float(input(f"How much are we betting (you have {tokens})? "))
+    x, tokens = transaction(tokens, bet)
+    if x == "n": return tokens
+    numbers = [i + 1 for i in range(100)]
+    random.shuffle(numbers)
+    player_targets = numbers[:15]
+    ai_targets = numbers[85:]
+    random.shuffle(numbers)
+    while True:
+        os.system("cls")
+        input(f"Your current targets: {list_targets(player_targets)}\nOpponents targets: {list_targets(ai_targets)}")
+        number = numbers.pop()
+        print(f"The number is {number}")
+        time.sleep(5)
+        input()
+        try:
+            ind = player_targets.index(number)
+            input(f"You had the number {number}!")
+            player_targets.pop(ind)
+        except ValueError: pass
+        try:
+            ind = ai_targets.index(number)
+            input(f"The opponent had the number {number}!")
+            ai_targets.pop(ind)
+        except ValueError: pass
+        if len(ai_targets) == 0: 
+            input(f"The opponent won and you lost {bet}!")
+            return tokens
+        if len(player_targets) == 0:
+            input(f"You won and got {bet}!")
+            return tokens + (bet*2)
 
-"""
+#"""
 tokens = 1000
 while True:
     os.system("cls")
-    inp = input("What do you want to play?\nHeads and tails (1) or blackjack (2): ")
+    inp = input("What do you want to play?\nHeads and tails (1), blackjack (2) or tombola (3): ")
     if inp == "1": tokens = ht(tokens)
     elif inp == "2": tokens = blackjack(tokens)
-"""
+    elif inp == "3": tokens = tombola(tokens)
+#"""
